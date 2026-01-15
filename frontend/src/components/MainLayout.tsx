@@ -7,7 +7,7 @@ const MainLayout = () => {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <main>
+            <main className="w-full h-screen flex flex-col">
                 <SidebarTrigger />
                 {<Outlet />}
             </main>
