@@ -15,7 +15,7 @@ class CustomUser(AbstractUser):
 
 class Chat(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    title = models.CharField(max_length=MAX_TITLE_LENGTH, blank=True)
+    title = models.CharField(max_length=MAX_TITLE_LENGTH, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
