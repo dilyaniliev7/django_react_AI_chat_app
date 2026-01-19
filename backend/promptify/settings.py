@@ -1,4 +1,7 @@
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -99,3 +102,5 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = "promptify_app.CustomUser"
+
+OPENAI_API_KEY=os.getenv("OPEN_API_KEY")
