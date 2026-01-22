@@ -11,7 +11,7 @@ client = OpenAI()
 
 now = timezone.now()
 today = now.date()
-yesterday = today - timedelta(days=4)
+yesterday = today - timedelta(days=1)
 seven_days_ago = today - timedelta(days=7)
 thirty_days_ago = today - timedelta(days=30)
 
@@ -82,6 +82,13 @@ def todays_chat(request):
 
 @api_view(["GET"])
 def yesterdays_chat(request):
-    chats = Chat.objects.filter(created_at_date=today)
+    chats = Chat.objects.filter(created_at_date=yesterday)
+    serializer = ChatSerializer(chats, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def seven_days_chat(request):
+    chats = Chat.objects.filter(created_at__lt=today, created_at__lt=yesterday, created_at__gte=seven_days_ago)
     serializer = ChatSerializer(chats, many=True)
     return Response(serializer.data)
