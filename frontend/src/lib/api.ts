@@ -31,3 +31,42 @@ export async function getChatMessages(chatId: string){
         throw new Error("an unknown error occured!");
         }
     }
+
+export async function getTodaysChats(){
+    try{
+        const response = await api.get("todays_chat/")
+        return response.data
+        }
+    catch(err:unknown){
+        if (err instanceof Error){
+            throw new Error(err.message)
+            }
+        throw new Error("an unknown error occured!");
+        }
+    }
+
+export async function getYesterdaysChats(){
+    try{
+        const response = await api.get("yesterdays_chat/")
+        return response.data
+        }
+    catch(err:unknown){
+        if (err instanceof Error){
+            throw new Error(err.message)
+            }
+        throw new Error("an unknown error occured!");
+        }
+    }
+
+export async function getSevenDaysChats(){
+    try{
+        const response = await api.get("seven_days_chat/")
+        return response.data
+        }
+    catch(err:unknown){
+        if (err instanceof Error){
+            throw new Error(err.message)
+            }
+        throw new Error("an unknown error occured!");
+        }
+    }

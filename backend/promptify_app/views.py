@@ -89,6 +89,6 @@ def yesterdays_chat(request):
 
 @api_view(["GET"])
 def seven_days_chat(request):
-    chats = Chat.objects.filter(created_at__lt=today, created_at__lt=yesterday, created_at__gte=seven_days_ago)
+    chats = Chat.objects.filter(created_at__lt=yesterday, created_at__gte=seven_days_ago)
     serializer = ChatSerializer(chats, many=True)
     return Response(serializer.data)
