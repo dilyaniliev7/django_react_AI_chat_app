@@ -7,7 +7,12 @@ class ChatSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+# class ChatMessageSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ChatMessage
+#         fields = ("id", "role", "content", "created_at")
+
 class ChatMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatMessage
-        fields = ("id", "role", "content", "created_at")
+        fields = ["role", "content"]

@@ -4,9 +4,16 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from promptify_app.models import Chat, ChatMessage
-
+from promptify_app.serializers import ChatMessageSerializer, ChatSerializer
+from django.utils import timezone
+from datetime import timedelta
 client = OpenAI()
 
+now = timezone.now()
+today = now.date()
+yesterday = today - timedelta(days=4)
+seven_days_ago = today - timedelta(days=7)
+thirty_days_ago = today - timedelta(days=30)
 
 def createChatTitle(user_message):
     try:
@@ -56,3 +63,25 @@ def prompt_gpt(request):
 
     ChatMessage.object.create(role="assistant", content=openai_reply, chat=chat)
     return Response({"reply": openai_reply}, status=status.HTTP_201_CREATED)
+
+
+@api_view(["GET"])
+def get_chat_messages(request, pk):
+    chat = Chat.objects.get(id=pk)
+    chatmessages = chat.messages.all()
+    serializer = ChatMessageSerializer(chatmessages, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def todays_chat(request):
+    chats = Chat.objects.filter(created_at_date=today)
+    serializer = ChatSerializer(chats, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def yesterdays_chat(request):
+    chats = Chat.objects.filter(created_at_date=today)
+    serializer = ChatSerializer(chats, many=True)
+    return Response(serializer.data)

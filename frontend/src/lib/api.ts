@@ -18,3 +18,16 @@ export function promptGPT(data: {chat_id: string, content: string}){
         throw new Error("an unknown error occured!");
         }
     }
+
+export async function getChatMessages(chatId: string){
+    try{
+        const response = await api.get(`get_chat_messages/${chatId}/`)
+        return response.data
+        }
+    catch(err:unknown){
+        if (err instanceof Error){
+            throw new Error(err.message)
+            }
+        throw new Error("an unknown error occured!");
+        }
+    }
