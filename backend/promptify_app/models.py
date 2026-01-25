@@ -23,7 +23,11 @@ class Chat(models.Model):
 
 
 class ChatMessage(models.Model):
-    ROLES = (("assistant", "assistant"),
+    # ROLES = (("assistant", "assistant"),
+    #          ("user", "user")
+    #          )
+
+    ROLES = (("model", "model"),
              ("user", "user")
              )
 

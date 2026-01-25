@@ -27,7 +27,7 @@ export default function Homepage() {
   }, [chat_uid]);
 
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Welcome! I'm here to assist you." },
+    { role: "model", content: "Welcome! I'm here to assist you." },
   ]);
 
   const mutation = useMutation({
@@ -36,7 +36,7 @@ export default function Homepage() {
       console.log(res);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: res.reply },
+        { role: "model", content: res.reply },
       ]);
     },
   });
@@ -59,7 +59,7 @@ export default function Homepage() {
   useEffect(() => {
     if (location.pathname == "/" || location.pathname == "/chats/new") {
       setMessages([
-        { role: "assistant", content: "Welcome! I'm here to assist you." },
+        { role: "model", content: "Welcome! I'm here to assist you." },
       ]);
 
       // setChatID("");

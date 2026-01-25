@@ -1,4 +1,3 @@
-from openai import OpenAI
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,7 +6,11 @@ from promptify_app.models import Chat, ChatMessage
 from promptify_app.serializers import ChatMessageSerializer, ChatSerializer
 from django.utils import timezone
 from datetime import timedelta
-client = OpenAI()
+from google import genai
+
+# client = OpenAI()
+client = genai.Client()
+
 
 now = timezone.now()
 today = now.date()
@@ -17,20 +20,17 @@ thirty_days_ago = today - timedelta(days=30)
 
 def createChatTitle(user_message):
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "assistant", "content": "Give a short, descriptive title for this conversation in not more than 5 words."},
-                {"role": "user", "content": user_message},
-            ]
+        response = client.generate_content(
+            model="gemini-3-flash-preview",
+            content=f"Give a short, descriptive title for this conversation: '{user_message}'. Keep it under 4 words."
         )
-        title = response.choices[0].message.content.strip()
+        title = response.text.strip()
     except Exception:
         title = user_message[:50]
     return title
 
 @api_view(['POST'])
-def prompt_gpt(request):
+def prompt_gemini(request):
     chat_id = request.data.get("chat_id")
     content = request.data.get("content")
 
@@ -48,22 +48,33 @@ def prompt_gpt(request):
 
     chat_messages = chat.messages.order_by("created_at")[:10]
 
-    openai_messages = [{"role": message.role, "content": message.content } for message in chat_messages]
+    gemini_history = []
 
-    if not any(message["role"]=="assistant" for message in openai_messages):
-        openai_messages.insert(0, {"role": "assistant", "content": "You are helpful assistant."})
+    for message in chat_messages:
+        gemini_history.append({
+            "role": message.role,
+            "parts": [{"text": message.content}]
+        })
+
+    if not any(message["role"] == "model" for message in gemini_history):
+        gemini_history.insert(0, {
+            "role": "model",
+            "parts": [{"text": "You are a helpful assistant"}]
+        })
+
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=openai_messages
+        chat_session = client.chats.create(
+            model="gemini-3-flash-preview",
+            history=gemini_history
         )
-        openai_reply = response.choices[0].message.content
+
+        gemini_response = chat_session.send_message(content)
+        gemini_reply = gemini_response.text
     except Exception as e:
-        return Response({"error": f"An error from OpenAI {str(e)}"}, status=500)
+        return Response({"error": f"An error from Gemini: {str(e)}"}, status=500)
 
-    ChatMessage.object.create(role="assistant", content=openai_reply, chat=chat)
-    return Response({"reply": openai_reply}, status=status.HTTP_201_CREATED)
-
+    ChatMessage.objects.create(role="model", content=gemini_reply, chat=chat)
+    return Response({"reply": gemini_reply}, status=status.HTTP_201_CREATED)
 
 @api_view(["GET"])
 def get_chat_messages(request, pk):
